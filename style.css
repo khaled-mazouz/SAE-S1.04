@@ -9,19 +9,30 @@ body{
 
 nav{
     display: flex;
+    position: sticky;
     justify-content: right;
     padding : 0.5rem;
     background-color: deepskyblue;
     gap: 10px;
 }
 
-nav div {
+nav div:first-child {
     margin-right: auto;
     padding : 5px;
     font-size: 1.2rem;
     color: white;
 
 }
+
+nav label[for="menu"] {
+    display: none;
+
+}
+
+#menu {
+    display: none;
+}
+    
 
 
 nav a {
@@ -34,9 +45,60 @@ nav a {
 
 
 footer{
-    position: absolute;
+    width: 100%;
+    position: fixed;
     bottom: 0;
     left: 0;
     padding: 10px;
     padding-left: 0;
+    background-color: rgb(55, 175, 175);
+}
+
+@media (max-width: 768px) {
+
+    footer{
+        position: static;
+        margin-top: 2rem;
+
+    }
+
+    nav{
+        flex-wrap: wrap;
+        position: fixed;
+        width: 100%;
+        top: 0;
+    }
+
+    nav a{
+        display: none;
+    }
+
+    nav label[for="menu"] {
+    display: flex;
+    padding: 5px;
+    font-size: 1.2rem;
+    color: white;
+    flex-direction: row;
+
+    }
+
+
+    
+    #menu:checked ~ a{
+        display: flex;
+        width: 100%;
+    }
+
+    #menu:checked ~ a:hover{
+        background-color: rgb(55, 175, 175);
+    }
+
+
+
+    #menu:not(:checked) ~ a{
+        display: none;
+    }
+
+
+
 }
