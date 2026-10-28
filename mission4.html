@@ -10,6 +10,9 @@
     <header>
         <nav>
             <div>Kdou</div>
+            <input type="checkbox" id="menu">
+            <label for="menu">☰</label>
+
             <a href="accueil.html">Accueil</a>
             <a href="mission1.html">Mission 1</a>
             <a href="mission2.html">Mission 2</a>
@@ -17,5 +20,81 @@
             <a href="mission4.html">Mission 4</a>
         </nav>
     </header>
+    <h1>Comparaison des commandes entre clients pilotes et clients partenaires</h1>
+    <section>
+        <h2> Énoncé de la requête et objectif</h2>
+        <p>
+            Problématique : Dans une réflexion sur le partenariat client, 
+            existe-t-il des clients pilotes d'un réseau partenaire ayant 
+            effectué autant de commandes que leurs clients partenaires ?
+        </p>
+        <h2>Intérêt de la requête dans le contexte de KDou</h2>
+        <p>
+            Cette requête permet à KDou de comparer l'activité de ses clients pilotes avec celle de leurs partenaires. 
+            Elle aide à identifier les couples présentant un nombre de commandes équivalent et à mieux comprendre le fonctionnement des réseaux partenaires. Ces informations peuvent 
+            contribuer à l'amélioration du suivi commercial et de la stratégie de partenariat.
+        </p>
+        <h2>Requête SQL</h2>
+        <pre><code> 
+SELECT C1.Contact AS Pilote, C2.Contact AS Partenaire, (                         
+    SELECT COUNT(*)
+    FROM Commande Co1
+    WHERE Co1.CodeCli = C1.CodeCli) AS NbCommande
+
+FROM Clientele C1 INNER JOIN Clientele C2
+ON C1.CodeCli = C2.CodeCliPart
+WHERE (
+	SELECT COUNT(*)
+	FROM Commande Co1
+	WHERE Co1.CodeCli = C1.CodeCli
+
+) = (
+    SELECT COUNT(*)
+    FROM Commande Co2
+    WHERE Co2.CodeCli = C2.CodeCli
+)
+ORDER BY C1.Contact;
+        </code></pre>
+        <h2>Explication de la conception :</h2>
+        <p>
+            La requête utilise une auto-jointure sur la table Clientele, 
+            représentée par deux alias : C1 pour le client pilote et C2 pour le client partenaire. 
+            La condition C1.CodeCli = C2.CodeCliPart permet d'associer chaque partenaire à son pilote.
+        </p>
+
+        <p>
+            Deux sous-requêtes corrélées utilisant COUNT(*) calculent respectivement le nombre de commandes du pilote et celui du partenaire. 
+            La clause WHERE compare ces deux nombres 
+            et conserve uniquement les couples pour lesquels ils sont égaux.
+        </p>
+
+        <p>
+            Une sous-requête supplémentaire dans le SELECT permet d'afficher le nombre de commandes commun aux deux clients. Enfin, 
+            les résultats sont triés par ordre alphabétique des contacts des clients pilotes.
+        </p>
+
+        <h2>Résultat et interprétation</h2>
+        <table>
+            <thead>
+                <tr>
+                 <th>Pilote</th>
+                 <th>Partenaire</th>
+                 <th>NbCommande</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Gus Kerba </td>
+                    <td>Isabelle Tricote</td>
+                    <td>17</td>
+                </tr>
+            </tbody>
+        </table>
+        
+    </section>
+    <footer>
+        <div>Groupe 106</div>
+        <div>Khaled Mazouz, Paul Eveno, Adham Alorbany, Raph-Nathan Colin</div>
+    </footer>
 </body>
 </html>
