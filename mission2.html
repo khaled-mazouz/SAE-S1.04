@@ -20,62 +20,109 @@
             <a href="mission4.html">Mission 4</a>
         </nav>
     </header>
-    <h1>Comparaison des commandes entre clients pilotes et clients partenaires</h1>
+    <h1>Calcul du chiffre d'affaires annuel des desserts et des boissons</h1>
     <main>
         <section>
-        <h2> Énoncé de la requête et objectif</h2>
+        <h2>Énoncé en langage naturel et objectif</h2>
         <p>
-            Problématique : Dans une réflexion sur le partenariat client, 
-            existe-t-il des clients pilotes d'un réseau partenaire ayant 
-            effectué autant de commandes que leurs clients partenaires ?
+            Calculer le chiffre d'affaires annuel des catégories « Desserts » et « Boissons », 
+            en regroupant les résultats par année et par catégorie.
+        </p>
+
+        <p>
+            L'objectif est de connaître 
+            le chiffre d'affaires généré chaque année par ces deux catégories de produits.
         </p>
         <h2>Intérêt de la requête dans le contexte de KDou</h2>
         <p>
-            Cette requête permet à KDou de comparer l'activité de ses clients pilotes avec celle de leurs partenaires. 
-            Elle aide à identifier les couples présentant un nombre de commandes équivalent et à mieux comprendre le fonctionnement des réseaux partenaires. Ces informations peuvent 
-            contribuer à l'amélioration du suivi commercial et de la stratégie de partenariat.
+            Cette requête permet à l'entreprise KDou de suivre l'évolution de son chiffre d'affaires 
+            pour les catégories Desserts et Boissons. Elle peut ainsi identifier les performances commerciales de ces catégories selon les années, comparer 
+            leur rentabilité et mieux orienter ses décisions concernant son offre de produits.
         </p>
         </section>
         <section>
         <h2>Requête SQL</h2>
         <pre><code> 
-SELECT C1.Contact AS Pilote, C2.Contact AS Partenaire, (                         
-    SELECT COUNT(*)
-    FROM Commande Co1
-    WHERE Co1.CodeCli = C1.CodeCli) AS NbCommande
+SELECT
+    Year(Commande.DateCde) AS Annee,
+    Categorie.NomCateg AS Categorie,
+    SUM(
+        DetailCommande.Quantite
+        * Produit.CoutAchat
+        * Categorie.CoefMarge
+        * (1 - DetailCommande.Remise / 100)
+    ) AS CA_Annuel
 
-FROM Clientele C1 INNER JOIN Clientele C2
-ON C1.CodeCli = C2.CodeCliPart
-WHERE (
-	SELECT COUNT(*)
-	FROM Commande Co1
-	WHERE Co1.CodeCli = C1.CodeCli
+FROM
+    (((Commande
+    INNER JOIN DetailCommande
+        ON Commande.[N° commande] = DetailCommande.[N° commande])
+    INNER JOIN Produit
+        ON DetailCommande.RefProduit = Produit.RefProd)
+    INNER JOIN Categorie
+        ON Produit.CodeCateg = Categorie.CodeCateg)
 
-) = (
-    SELECT COUNT(*)
-    FROM Commande Co2
-    WHERE Co2.CodeCli = C2.CodeCli
-)
-ORDER BY C1.Contact;
+WHERE
+    Categorie.NomCateg IN ('Desserts', 'Boissons')
+
+GROUP BY
+    Year(Commande.DateCde),
+    Categorie.NomCateg
+
+ORDER BY
+    Year(Commande.DateCde),
+    Categorie.NomCateg;
         </code></pre>
         </section>
         <section>
         <h2>Explication de la conception :</h2>
+        <h3>Association des tables</h3>
+        <ul>
+            <li>Commande : permet de récupérer la date de chaque commande</li>
+            <li>DetailCommande : contient les quantités commandées et les remises appliquées.</li>
+            <li>Produit : permet de récupérer le coût d'achat des produits.</li>
+            <li>Categorie : permet de récupérer le nom de la catégorie et son coefficient de marge.</li>
+        </ul>
+        <div>Les INNER JOIN permettent de relier ces quatre tables grâce à leurs champs communs.</div>
+        
+        <h3>Filtrage des catégories</h3>
         <p>
-            La requête utilise une auto-jointure sur la table Clientele, 
-            représentée par deux alias : C1 pour le client pilote et C2 pour le client partenaire. 
-            La condition C1.CodeCli = C2.CodeCliPart permet d'associer chaque partenaire à son pilote.
+            La condition :
+
+            WHERE Categorie.NomCateg IN ('Desserts', 'Boissons')
+
+            permet de conserver uniquement les produits appartenant aux catégories Desserts et Boissons.
         </p>
 
+        <h3>Calcul du chiffre d'affaires</h3>
         <p>
-            Deux sous-requêtes corrélées utilisant COUNT(*) calculent respectivement le nombre de commandes du pilote et celui du partenaire. 
-            La clause WHERE compare ces deux nombres 
-            et conserve uniquement les couples pour lesquels ils sont égaux.
+            La fonction SUM() additionne les montants calculés pour chaque ligne de commande.
+
+            Le calcul est :
+
+            Quantité × Coût d'achat × Coefficient de marge × (1 - Remise / 100)
+
+            Cela permet de prendre en compte la quantité vendue, 
+            le coût d'achat, la marge appliquée et la remise accordée.
         </p>
 
+        <h3>Regroupement des résultats</h3>
         <p>
-            Une sous-requête supplémentaire dans le SELECT permet d'afficher le nombre de commandes commun aux deux clients. Enfin, 
-            les résultats sont triés par ordre alphabétique des contacts des clients pilotes.
+            a clause GROUP BY regroupe les données selon deux critères :
+
+            L'année de la commande, extraite avec Year().
+
+            Le nom de la catégorie.
+
+            La fonction SUM() calcule donc un chiffre d'affaires pour chaque combinaison 
+            année-catégorie.
+        </p>
+
+        <h3>Tri des résultats</h3>
+
+        <p> 
+            La clause ORDER BY classe les résultats par année, 
+            puis par catégorie, afin de faciliter leur lecture.
         </p>
         </section>
         <section>
@@ -83,26 +130,66 @@ ORDER BY C1.Contact;
         <table>
             <thead>
                 <tr>
-                 <th>Pilote</th>
-                 <th>Partenaire</th>
-                 <th>NbCommande</th>
+                 <th>Annee</th>
+                 <th>Categorie</th>
+                 <th>CA_Annuel</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Gus Kerba </td>
-                    <td>Isabelle Tricote</td>
-                    <td>17</td>
+                    <td>2020</td>
+                    <td>Boissons</td>
+                    <td>122127,760509586</td>
+                </tr>
+               <tr>
+                    <td>2020</td>
+                    <td>Desserts</td>
+                    <td>57553,056054093</td>
+                </tr>
+                               <tr>
+                    <td>2021</td>
+                    <td>Boissons</td>
+                    <td>982013,768338495</td>
+                </tr>
+                               <tr>
+                    <td>2021</td>
+                    <td>Desserts</td>
+                    <td>513394,139360736</td>
+                </tr>
+                               <tr>
+                    <td>2022</td>
+                    <td>Boissons</td>
+                    <td>437,5</td>
+                </tr>
+                               <tr>
+                    <td>2022</td>
+                    <td>Desserts</td>
+                    <td>1118,32321179756</td>
                 </tr>
             </tbody>
         </table>
         <h2>Interprétation du résultat</h2>
-        <p>
-            La requête retourne un couple de clients dont chacun a effectué 17 commandes. 
-            Le nombre de commandes du pilote est donc identique à celui de son partenaire. 
-            Ce résultat met en évidence une égalité de leur activité en matière de commandes, 
-            sans pour autant signifier que leurs chiffres d'affaires sont identiques.
-        </p>
+        <ul>
+            <li>En 2020 : la catégorie Boissons génère un montant de 122 127,76, contre 57 553,06 pour les Desserts. 
+                Les Boissons représentent donc le montant le plus élevé.
+            </li>
+            <li>
+                En 2021 : les deux catégories connaissent une forte augmentation. 
+                Les Boissons atteignent 982 013,77 et les Desserts 513 394,14
+            </li>
+            <li>
+                En 2022 : les montants sont nettement plus faibles, 
+                avec 437,50 pour les Boissons et 1 118,32 pour les Desserts. 
+                Contrairement aux deux années précédentes, 
+                les Desserts dépassent les Boissons.
+            </li>
+            <p>
+                En 2022 : les montants sont nettement plus faibles, 
+                avec 437,50 pour les Boissons et 1 118,32 pour les Desserts. 
+                Contrairement aux deux années précédentes, 
+                les Desserts dépassent les Boissons.
+            </p>
+        </ul>
         </section>
     </main>    
     <footer>
