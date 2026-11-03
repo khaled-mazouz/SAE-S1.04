@@ -21,7 +21,8 @@
         </nav>
     </header>
     <h1>Comparaison des commandes entre clients pilotes et clients partenaires</h1>
-    <section>
+    <main>
+        <section>
         <h2> Énoncé de la requête et objectif</h2>
         <p>
             Problématique : Dans une réflexion sur le partenariat client, 
@@ -34,6 +35,8 @@
             Elle aide à identifier les couples présentant un nombre de commandes équivalent et à mieux comprendre le fonctionnement des réseaux partenaires. Ces informations peuvent 
             contribuer à l'amélioration du suivi commercial et de la stratégie de partenariat.
         </p>
+        </section>
+        <section>
         <h2>Requête SQL</h2>
         <pre><code> 
 SELECT C1.Contact AS Pilote, C2.Contact AS Partenaire, (                         
@@ -55,6 +58,8 @@ WHERE (
 )
 ORDER BY C1.Contact;
         </code></pre>
+        </section>
+        <section>
         <h2>Explication de la conception :</h2>
         <p>
             La requête utilise une auto-jointure sur la table Clientele, 
@@ -72,8 +77,9 @@ ORDER BY C1.Contact;
             Une sous-requête supplémentaire dans le SELECT permet d'afficher le nombre de commandes commun aux deux clients. Enfin, 
             les résultats sont triés par ordre alphabétique des contacts des clients pilotes.
         </p>
-
-        <h2>Résultat et interprétation</h2>
+        </section>
+        <section>
+        <h2>Résultat</h2>
         <table>
             <thead>
                 <tr>
@@ -90,8 +96,15 @@ ORDER BY C1.Contact;
                 </tr>
             </tbody>
         </table>
-        
-    </section>
+        <h2>Interprétation du résultat</h2>
+        <p>
+            La requête retourne un couple de clients dont chacun a effectué 17 commandes. 
+            Le nombre de commandes du pilote est donc identique à celui de son partenaire. 
+            Ce résultat met en évidence une égalité de leur activité en matière de commandes, 
+            sans pour autant signifier que leurs chiffres d'affaires sont identiques.
+        </p>
+        </section>
+    </main>    
     <footer>
         <div>Groupe 106</div>
         <div>Khaled Mazouz, Paul Eveno, Adham Alorbany, Raph-Nathan Colin</div>
