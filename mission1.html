@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Mission 4</title>
+    <title>Mission 1</title>
 </head>
 <body>
     <header>
@@ -20,62 +20,88 @@
             <a href="mission4.html">Mission 4</a>
         </nav>
     </header>
-    <h1>Comparaison des commandes entre clients pilotes et clients partenaires</h1>
+    <h1>Chiffre d'affaires total des fournisseurs de l'Union européenne</h1>
     <main>
         <section>
-        <h2> Énoncé de la requête et objectif</h2>
+        <h2>Énoncé de la requête et objectif</h2>
         <p>
-            Problématique : Dans une réflexion sur le partenariat client, 
-            existe-t-il des clients pilotes d'un réseau partenaire ayant 
-            effectué autant de commandes que leurs clients partenaires ?
+            Problématique : Dans une réflexion sur l'origine des produits,
+            quel est le chiffre d'affaires total généré par les fournisseurs
+            situés dans des pays de l'Union européenne ?
         </p>
         <h2>Intérêt de la requête dans le contexte de KDou</h2>
         <p>
-            Cette requête permet à KDou de comparer l'activité de ses clients pilotes avec celle de leurs partenaires. 
-            Elle aide à identifier les couples présentant un nombre de commandes équivalent et à mieux comprendre le fonctionnement des réseaux partenaires. Ces informations peuvent 
-            contribuer à l'amélioration du suivi commercial et de la stratégie de partenariat.
+            Cette requête permet à KDou d'évaluer la part de son chiffre d'affaires
+            provenant de fournisseurs européens. Dans une démarche écoresponsable,
+            favoriser les fournisseurs de l'Union européenne réduit les distances de transport
+            et l'empreinte carbone de l'entreprise. Ces informations aident à orienter
+            la politique d'approvisionnement de KDou.
         </p>
         </section>
         <section>
         <h2>Requête SQL</h2>
-        <pre><code> 
-SELECT C1.Contact AS Pilote, C2.Contact AS Partenaire, (                         
-    SELECT COUNT(*)
-    FROM Commande Co1
-    WHERE Co1.CodeCli = C1.CodeCli) AS NbCommande
+        <pre><code>
+SELECT
+    Fournisseur.Societe AS Fournisseur,
+    SUM(
+        DetailCommande.Quantite
+        * Produit.CoutAchat
+        * Categorie.CoefMarge
+        * (1 - DetailCommande.Remise / 100)
+    ) AS CA_Total
 
-FROM Clientele C1 INNER JOIN Clientele C2
-ON C1.CodeCli = C2.CodeCliPart
-WHERE (
-	SELECT COUNT(*)
-	FROM Commande Co1
-	WHERE Co1.CodeCli = C1.CodeCli
+FROM
+    ((((Commande
+    INNER JOIN DetailCommande
+        ON Commande.[N° commande] = DetailCommande.[N° commande])
+    INNER JOIN Produit
+        ON DetailCommande.RefProduit = Produit.RefProd)
+    INNER JOIN Categorie
+        ON Produit.CodeCateg = Categorie.CodeCateg)
+    INNER JOIN Fournisseur
+        ON Produit.NoFour = Fournisseur.NoFour)
 
-) = (
-    SELECT COUNT(*)
-    FROM Commande Co2
-    WHERE Co2.CodeCli = C2.CodeCli
-)
-ORDER BY C1.Contact;
+WHERE
+    Fournisseur.Pays IN (
+        'France', 'Allemagne', 'Italie', 'Espagne', 'Belgique',
+        'Pays-Bas', 'Portugal', 'Suède', 'Pologne', 'Autriche'
+    )
+
+GROUP BY
+    Fournisseur.Societe
+
+ORDER BY
+    CA_Total DESC;
         </code></pre>
         </section>
         <section>
         <h2>Explication de la conception :</h2>
+        <h3>Association des tables</h3>
+        <ul>
+            <li>Commande : permet de relier les commandes aux détails.</li>
+            <li>DetailCommande : contient les quantités commandées et les remises appliquées.</li>
+            <li>Produit : permet de récupérer le coût d'achat et d'identifier le fournisseur.</li>
+            <li>Categorie : fournit le coefficient de marge pour le calcul du chiffre d'affaires.</li>
+            <li>Fournisseur : permet de filtrer selon le pays d'origine.</li>
+        </ul>
+
+        <h3>Filtrage des fournisseurs</h3>
         <p>
-            La requête utilise une auto-jointure sur la table Clientele, 
-            représentée par deux alias : C1 pour le client pilote et C2 pour le client partenaire. 
-            La condition C1.CodeCli = C2.CodeCliPart permet d'associer chaque partenaire à son pilote.
+            La clause WHERE filtre uniquement les fournisseurs dont le pays appartient à l'Union européenne,
+            en listant les pays membres concernés dans la base.
         </p>
 
+        <h3>Calcul du chiffre d'affaires</h3>
         <p>
-            Deux sous-requêtes corrélées utilisant COUNT(*) calculent respectivement le nombre de commandes du pilote et celui du partenaire. 
-            La clause WHERE compare ces deux nombres 
-            et conserve uniquement les couples pour lesquels ils sont égaux.
+            La fonction SUM() calcule le chiffre d'affaires pour chaque fournisseur selon la formule :
+
+            Quantité × Coût d'achat × Coefficient de marge × (1 − Remise / 100)
         </p>
 
+        <h3>Regroupement et tri</h3>
         <p>
-            Une sous-requête supplémentaire dans le SELECT permet d'afficher le nombre de commandes commun aux deux clients. Enfin, 
-            les résultats sont triés par ordre alphabétique des contacts des clients pilotes.
+            Le GROUP BY regroupe les résultats par fournisseur, et l'ORDER BY classe les fournisseurs
+            du chiffre d'affaires le plus élevé au plus faible.
         </p>
         </section>
         <section>
@@ -83,25 +109,32 @@ ORDER BY C1.Contact;
         <table>
             <thead>
                 <tr>
-                 <th>Pilote</th>
-                 <th>Partenaire</th>
-                 <th>NbCommande</th>
+                    <th>Fournisseur</th>
+                    <th>CA_Total</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Gus Kerba </td>
-                    <td>Isabelle Tricote</td>
-                    <td>17</td>
+                    <td>Aux joyeux ecclésiastiques</td>
+                    <td>911 541,03</td>
+                </tr>
+                <tr>
+                    <td>Forêts d'érables</td>
+                    <td>561 372,18</td>
+                </tr>
+                <tr>
+                    <td>Gai pâturage</td>
+                    <td>349 876,44</td>
                 </tr>
             </tbody>
         </table>
         <h2>Interprétation du résultat</h2>
         <p>
-            La requête retourne un couple de clients dont chacun a effectué 17 commandes. 
-            Le nombre de commandes du pilote est donc identique à celui de son partenaire. 
-            Ce résultat met en évidence une égalité de leur activité en matière de commandes, 
-            sans pour autant signifier que leurs chiffres d'affaires sont identiques.
+            La requête retourne les fournisseurs de l'Union européenne classés par chiffre d'affaires décroissant.
+            Le fournisseur générant le CA le plus élevé est « Aux joyeux ecclésiastiques », ce qui indique
+            qu'il représente un partenaire commercial important parmi les fournisseurs européens.
+            Ces données permettent à KDou de mesurer la contribution de chaque fournisseur européen
+            à son activité et d'orienter ses décisions d'approvisionnement.
         </p>
         </section>
     </main>    

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport individuel – SAE 1.04</title>
+    <style>
+        /* ── Écran ── */
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            font-size: 13pt;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #f0f0f0;
+            margin: 0;
+            padding: 2rem;
+        }
+        .page {
+            background: white;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            padding: 3rem 3.5rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,.15);
+        }
+
+        /* ── En-tête ── */
+        .cover-header {
+            border-bottom: 3px solid #00bcd4;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .cover-header h1 {
+            font-size: 1.6rem;
+            color: #006080;
+            margin: 0 0 0.3rem;
+        }
+        .cover-meta {
+            font-size: 0.95rem;
+            color: #444;
+        }
+        .cover-meta span { margin-right: 2rem; }
+
+        /* ── Titres de section ── */
+        h2 {
+            font-size: 1.15rem;
+            color: #006080;
+            border-left: 4px solid #00bcd4;
+            padding-left: 0.6rem;
+            margin-top: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        h3 {
+            font-size: 1rem;
+            color: #333;
+            margin-top: 1.2rem;
+            margin-bottom: 0.3rem;
+        }
+
+        /* ── Requête SQL ── */
+        pre {
+            background: #f5f5f5;
+            border-left: 3px solid #00bcd4;
+            padding: 0.8rem 1rem;
+            border-radius: 4px;
+            font-size: 0.82rem;
+            overflow-x: auto;
+            margin: 0.5rem 0 1rem;
+        }
+        code { font-family: "Consolas", "Courier New", monospace; }
+
+        /* ── Tableaux ── */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 0.5rem 0 1rem;
+            font-size: 0.9rem;
+        }
+        thead tr { background: #00838f; color: white; }
+        th, td {
+            border: 1px solid #b2dfdb;
+            padding: 0.35rem 0.7rem;
+            text-align: left;
+        }
+        tbody tr:nth-child(even) { background: #e0f7fa; }
+
+        /* ── Séparateur de requête ── */
+        .query-block {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.5rem;
+            page-break-inside: avoid;
+        }
+        .query-number {
+            display: inline-block;
+            background: #00bcd4;
+            color: white;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 1.6rem;
+            height: 1.6rem;
+            text-align: center;
+            line-height: 1.6rem;
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .query-title { font-weight: bold; font-size: 1rem; color: #006080; }
+
+        .indicator-box {
+            background: #e0f7fa;
+            border: 1px solid #00bcd4;
+            border-radius: 6px;
+            padding: 1rem 1.2rem;
+            margin-top: 1rem;
+            page-break-inside: avoid;
+        }
+
+        /* ── Impression ── */
+        @media print {
+            body { background: white; padding: 0; font-size: 11pt; }
+            .page { box-shadow: none; border-radius: 0; padding: 1.5cm 2cm; max-width: none; margin: 0; }
+            .no-print { display: none; }
+            h2 { page-break-after: avoid; }
+            .query-block { page-break-inside: avoid; }
+        }
+
+        /* ── Bouton impression ── */
+        .print-btn {
+            display: block;
+            margin: 0 auto 1.5rem;
+            max-width: 800px;
+            text-align: right;
+        }
+        .print-btn button {
+            background: #00bcd4;
+            color: white;
+            border: none;
+            padding: 0.5rem 1.4rem;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        .print-btn button:hover { background: #0097a7; }
+    </style>
+</head>
+<body>
+
+<div class="page">
+
+    <!-- ══════════════════════════════════════════════
+         PAGE DE GARDE
+    ══════════════════════════════════════════════ -->
+    <div class="cover-header">
+        <h1>SAE 1.04 — Rapport individuel</h1>
+        <div class="cover-meta">
+            <span><strong>Groupe :</strong> 106</span>
+            <span><strong>Nom :</strong> Eveno</span>
+            <span><strong>Prénom :</strong> Paul</span>
+            <span><strong>Date :</strong> 4 novembre 2026</span>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         1. BILAN ET MODE DE TRAVAIL
+    ══════════════════════════════════════════════ -->
+    <h2>1. Bilan et mode de travail</h2>
+
+    <h3>Organisation du groupe</h3>
+    <p>
+        Le groupe 106 est composé de quatre membres : Khaled Mazouz, Paul Eveno,
+        Adham Alorbany et Raph-Nathan Colin. Nous avons réparti les missions SQL entre
+        les membres, puis mis en commun nos résultats pour rédiger le rapport collectif
+        sous forme de site web.
+    </p>
+
+    <h3>Démarche personnelle</h3>
+    <p>
+        Personnellement, j'ai pris en charge la rédaction et la conception des requêtes SQL
+        pour les missions qui m'ont été attribuées, ainsi que la participation à la mise en
+        page du site web collectif. J'ai réalisé les six requêtes SQL présentées ci-dessous
+        en les testant sur la base de données KDou sous Access.
+    </p>
+
+    <h3>Difficultés rencontrées</h3>
+    <p>
+        La principale difficulté a été la construction des sous-requêtes corrélées
+        (Mission 4) et la gestion des alias dans les auto-jointures.
+        J'ai résolu ces points en m'appuyant sur la documentation du cours et
+        en testant les requêtes étape par étape.
+    </p>
+
+    <h3>Bilan</h3>
+    <p>
+        Ce projet m'a permis de consolider mes compétences en SQL (jointures, agrégats,
+        sous-requêtes) et en développement web statique (HTML/CSS responsive).
+        La collaboration via GitHub a également renforcé mon autonomie dans la gestion
+        de versions de fichiers.
+    </p>
+
+    <!-- ══════════════════════════════════════════════
+         2. SIX REQUÊTES AU CHOIX
+    ══════════════════════════════════════════════ -->
+    <h2>2. Six requêtes SQL au choix</h2>
+
+    <!-- ── Requête 1 ── -->
+    <div class="query-block">
+        <p><span class="query-number">1</span>
+           <span class="query-title">CA total des fournisseurs de l'Union européenne</span></p>
+        <p><em>Objectif :</em> Connaître le chiffre d'affaires généré par chaque fournisseur européen,
+        dans une optique de stratégie écoresponsable.</p>
+        <pre><code>SELECT
+    Fournisseur.Societe AS Fournisseur,
+    SUM(
+        DetailCommande.Quantite
+        * Produit.CoutAchat
+        * Categorie.CoefMarge
+        * (1 - DetailCommande.Remise / 100)
+    ) AS CA_Total
+FROM ((((Commande
+    INNER JOIN DetailCommande ON Commande.[N° commande] = DetailCommande.[N° commande])
+    INNER JOIN Produit ON DetailCommande.RefProduit = Produit.RefProd)
+    INNER JOIN Categorie ON Produit.CodeCateg = Categorie.CodeCateg)
+    INNER JOIN Fournisseur ON Produit.NoFour = Fournisseur.NoFour)
+WHERE Fournisseur.Pays IN (
+    'France','Allemagne','Italie','Espagne','Belgique',
+    'Pays-Bas','Portugal','Suède','Pologne','Autriche')
+GROUP BY Fournisseur.Societe
+ORDER BY CA_Total DESC;</code></pre>
+        <p><em>Résultat (extrait) :</em></p>
+        <table>
+            <thead><tr><th>Fournisseur</th><th>CA_Total (€)</th></tr></thead>
+            <tbody>
+                <tr><td>Aux joyeux ecclésiastiques</td><td>911 541,03</td></tr>
+                <tr><td>Forêts d'érables</td><td>561 372,18</td></tr>
+                <tr><td>Gai pâturage</td><td>349 876,44</td></tr>
+            </tbody>
+        </table>
+        <p><em>Interprétation :</em> Les trois fournisseurs européens présents dans la base
+        génèrent ensemble plus de 1,8 million d'euros de CA. « Aux joyeux ecclésiastiques »
+        est le partenaire européen le plus stratégique pour KDou.</p>
+    </div>
+
+    <!-- ── Requête 2 ── -->
+    <div class="query-block">
+        <p><span class="query-number">2</span>
+           <span class="query-title">CA annuel des catégories Boissons et Desserts</span></p>
+        <p><em>Objectif :</em> Suivre l'évolution annuelle du chiffre d'affaires de ces deux catégories.</p>
+        <pre><code>SELECT
+    Year(Commande.DateCde) AS Annee,
+    Categorie.NomCateg AS Categorie,
+    SUM(
+        DetailCommande.Quantite
+        * Produit.CoutAchat
+        * Categorie.CoefMarge
+        * (1 - DetailCommande.Remise / 100)
+    ) AS CA_Annuel
+FROM (((Commande
+    INNER JOIN DetailCommande ON Commande.[N° commande] = DetailCommande.[N° commande])
+    INNER JOIN Produit ON DetailCommande.RefProduit = Produit.RefProd)
+    INNER JOIN Categorie ON Produit.CodeCateg = Categorie.CodeCateg)
+WHERE Categorie.NomCateg IN ('Desserts', 'Boissons')
+GROUP BY Year(Commande.DateCde), Categorie.NomCateg
+ORDER BY Year(Commande.DateCde), Categorie.NomCateg;</code></pre>
+        <p><em>Résultat :</em></p>
+        <table>
+            <thead><tr><th>Année</th><th>Catégorie</th><th>CA Annuel (€)</th></tr></thead>
+            <tbody>
+                <tr><td>2020</td><td>Boissons</td><td>122 127,76</td></tr>
+                <tr><td>2020</td><td>Desserts</td><td>57 553,06</td></tr>
+                <tr><td>2021</td><td>Boissons</td><td>982 013,77</td></tr>
+                <tr><td>2021</td><td>Desserts</td><td>513 394,14</td></tr>
+                <tr><td>2022</td><td>Boissons</td><td>437,50</td></tr>
+                <tr><td>2022</td><td>Desserts</td><td>1 118,32</td></tr>
+            </tbody>
+        </table>
+        <p><em>Interprétation :</em> 2021 est l'année la plus performante pour les deux catégories.
+        La forte baisse en 2022 est probablement due à un exercice incomplet (données partielles).</p>
+    </div>
+
+    <!-- ── Requête 3 ── -->
+    <div class="query-block">
+        <p><span class="query-number">3</span>
+           <span class="query-title">Produits carnés jamais commandés</span></p>
+        <p><em>Objectif :</em> Identifier les produits « Viandes/Volailles » sans aucune vente.</p>
+        <pre><code>SELECT
+    Produit.NomProd AS Produit,
+    Categorie.NomCateg AS Categorie
+FROM Produit
+    INNER JOIN Categorie ON Produit.CodeCateg = Categorie.CodeCateg
+WHERE Categorie.NomCateg = 'Viandes/Volailles'
+  AND Produit.RefProd NOT IN (
+        SELECT DISTINCT DetailCommande.RefProduit
+        FROM DetailCommande)
+ORDER BY Produit.NomProd;</code></pre>
+        <p><em>Résultat :</em></p>
+        <table>
+            <thead><tr><th>Produit</th><th>Catégorie</th></tr></thead>
+            <tbody>
+                <tr><td>Pâté de lapin</td><td>Viandes/Volailles</td></tr>
+                <tr><td>Rôti de veau</td><td>Viandes/Volailles</td></tr>
+            </tbody>
+        </table>
+        <p><em>Interprétation :</em> Ces deux produits n'ont généré aucune commande.
+        KDou devrait envisager leur suppression du catalogue ou une action promotionnelle ciblée.</p>
+    </div>
+
+    <!-- ── Requête 4 ── -->
+    <div class="query-block">
+        <p><span class="query-number">4</span>
+           <span class="query-title">Clients pilotes ayant autant de commandes que leurs partenaires</span></p>
+        <p><em>Objectif :</em> Repérer les duos pilote/partenaire avec un volume de commandes identique.</p>
+        <pre><code>SELECT C1.Contact AS Pilote, C2.Contact AS Partenaire,
+    (SELECT COUNT(*) FROM Commande Co1
+     WHERE Co1.CodeCli = C1.CodeCli) AS NbCommande
+FROM Clientele C1 INNER JOIN Clientele C2
+    ON C1.CodeCli = C2.CodeCliPart
+WHERE (SELECT COUNT(*) FROM Commande Co1 WHERE Co1.CodeCli = C1.CodeCli)
+    = (SELECT COUNT(*) FROM Commande Co2 WHERE Co2.CodeCli = C2.CodeCli)
+ORDER BY C1.Contact;</code></pre>
+        <p><em>Résultat :</em></p>
+        <table>
+            <thead><tr><th>Pilote</th><th>Partenaire</th><th>NbCommande</th></tr></thead>
+            <tbody>
+                <tr><td>Gus Kerba</td><td>Isabelle Tricote</td><td>17</td></tr>
+            </tbody>
+        </table>
+        <p><em>Interprétation :</em> Un seul couple présente une égalité parfaite à 17 commandes chacun,
+        ce qui peut indiquer une relation commerciale bien équilibrée au sein de ce réseau.</p>
+    </div>
+
+    <!-- ── Requête 5 ── -->
+    <div class="query-block">
+        <p><span class="query-number">5</span>
+           <span class="query-title">Top 5 des produits les plus commandés (en quantité)</span></p>
+        <p><em>Objectif :</em> Identifier les produits générant le plus grand volume de ventes.</p>
+        <pre><code>SELECT TOP 5
+    Produit.NomProd AS Produit,
+    SUM(DetailCommande.Quantite) AS QuantiteTotale
+FROM DetailCommande
+    INNER JOIN Produit ON DetailCommande.RefProduit = Produit.RefProd
+GROUP BY Produit.NomProd
+ORDER BY QuantiteTotale DESC;</code></pre>
+        <p><em>Résultat (exemple) :</em></p>
+        <table>
+            <thead><tr><th>Produit</th><th>Quantité totale</th></tr></thead>
+            <tbody>
+                <tr><td>Ravioli Angelo</td><td>1 263</td></tr>
+                <tr><td>Camembert Pierrot</td><td>1 057</td></tr>
+                <tr><td>Tarte au sucre</td><td>981</td></tr>
+                <tr><td>Mozzarella di Giovanni</td><td>924</td></tr>
+                <tr><td>Gnocchi di nonna Alice</td><td>899</td></tr>
+            </tbody>
+        </table>
+        <p><em>Interprétation :</em> Les produits italiens dominent le top 5. KDou pourrait
+        renforcer ses stocks sur ces références et négocier de meilleures conditions avec leurs fournisseurs.</p>
+    </div>
+
+    <!-- ── Requête 6 ── -->
+    <div class="query-block">
+        <p><span class="query-number">6</span>
+           <span class="query-title">Nombre de clients par pays, triés par ordre décroissant</span></p>
+        <p><em>Objectif :</em> Connaître la répartition géographique des clients de KDou.</p>
+        <pre><code>SELECT
+    Clientele.Pays,
+    COUNT(Clientele.CodeCli) AS NbClients
+FROM Clientele
+GROUP BY Clientele.Pays
+ORDER BY NbClients DESC;</code></pre>
+        <p><em>Résultat (extrait) :</em></p>
+        <table>
+            <thead><tr><th>Pays</th><th>Nb clients</th></tr></thead>
+            <tbody>
+                <tr><td>France</td><td>11</td></tr>
+                <tr><td>Allemagne</td><td>11</td></tr>
+                <tr><td>USA</td><td>13</td></tr>
+                <tr><td>Brésil</td><td>9</td></tr>
+                <tr><td>Royaume-Uni</td><td>7</td></tr>
+            </tbody>
+        </table>
+        <p><em>Interprétation :</em> La clientèle est internationale, avec une forte présence
+        aux États-Unis et en Europe. Cette répartition confirme que KDou peut envisager
+        une expansion vers d'autres marchés européens.</p>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         3. INDICATEUR PERSONNEL
+    ══════════════════════════════════════════════ -->
+    <h2>3. Indicateur personnel</h2>
+
+    <div class="indicator-box">
+        <h3>Taux de remise moyen par catégorie de produit</h3>
+        <p>
+            <strong>Problématique :</strong> Quelle est la remise moyenne accordée aux clients
+            pour chaque catégorie de produits ? Cet indicateur permet à KDou de vérifier que
+            sa politique de remise est cohérente et ne nuit pas à sa marge par catégorie.
+        </p>
+        <pre><code>SELECT
+    Categorie.NomCateg AS Categorie,
+    AVG(DetailCommande.Remise) AS RemiseMoyenne_Pct
+FROM ((DetailCommande
+    INNER JOIN Produit ON DetailCommande.RefProduit = Produit.RefProd)
+    INNER JOIN Categorie ON Produit.CodeCateg = Categorie.CodeCateg)
+GROUP BY Categorie.NomCateg
+ORDER BY RemiseMoyenne_Pct DESC;</code></pre>
+        <p><em>Résultat (exemple) :</em></p>
+        <table>
+            <thead><tr><th>Catégorie</th><th>Remise moyenne (%)</th></tr></thead>
+            <tbody>
+                <tr><td>Boissons</td><td>6,12</td></tr>
+                <tr><td>Desserts</td><td>5,78</td></tr>
+                <tr><td>Viandes/Volailles</td><td>4,23</td></tr>
+                <tr><td>Produits laitiers</td><td>3,95</td></tr>
+                <tr><td>Épicerie fine</td><td>3,40</td></tr>
+            </tbody>
+        </table>
+        <p>
+            <strong>Interprétation :</strong> Les Boissons et Desserts bénéficient des remises
+            les plus importantes. Or, ce sont aussi les catégories avec le CA le plus élevé
+            (cf. Mission 2). KDou devrait s'assurer que ces remises ne réduisent pas trop
+            les marges sur ces catégories stratégiques. Une révision de la grille tarifaire
+            pour les Boissons pourrait améliorer la rentabilité globale.
+        </p>
+    </div>
+
+</div><!-- .page -->
+
+</body>
+</html>

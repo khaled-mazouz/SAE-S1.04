@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Mission 4</title>
+    <title>Mission 3</title>
 </head>
 <body>
     <header>
@@ -20,62 +20,72 @@
             <a href="mission4.html">Mission 4</a>
         </nav>
     </header>
-    <h1>Comparaison des commandes entre clients pilotes et clients partenaires</h1>
+    <h1>Produits carnés n'ayant jamais été commandés</h1>
     <main>
         <section>
-        <h2> Énoncé de la requête et objectif</h2>
+        <h2>Énoncé de la requête et objectif</h2>
         <p>
-            Problématique : Dans une réflexion sur le partenariat client, 
-            existe-t-il des clients pilotes d'un réseau partenaire ayant 
-            effectué autant de commandes que leurs clients partenaires ?
+            Problématique : Dans une réflexion sur l'offre commerciale,
+            quels sont les produits appartenant à la catégorie « Viandes/Volailles »
+            qui n'ont jamais fait l'objet d'une commande ?
         </p>
         <h2>Intérêt de la requête dans le contexte de KDou</h2>
         <p>
-            Cette requête permet à KDou de comparer l'activité de ses clients pilotes avec celle de leurs partenaires. 
-            Elle aide à identifier les couples présentant un nombre de commandes équivalent et à mieux comprendre le fonctionnement des réseaux partenaires. Ces informations peuvent 
-            contribuer à l'amélioration du suivi commercial et de la stratégie de partenariat.
+            Cette requête permet à KDou d'identifier les produits carnés présents dans son catalogue
+            mais qui n'ont généré aucune vente. Ces informations sont utiles pour rationaliser l'offre,
+            supprimer les produits non rentables ou adapter la stratégie commerciale afin de réduire
+            les stocks inutiles et améliorer la rentabilité.
         </p>
         </section>
         <section>
         <h2>Requête SQL</h2>
-        <pre><code> 
-SELECT C1.Contact AS Pilote, C2.Contact AS Partenaire, (                         
-    SELECT COUNT(*)
-    FROM Commande Co1
-    WHERE Co1.CodeCli = C1.CodeCli) AS NbCommande
+        <pre><code>
+SELECT
+    Produit.NomProd AS Produit,
+    Categorie.NomCateg AS Categorie
 
-FROM Clientele C1 INNER JOIN Clientele C2
-ON C1.CodeCli = C2.CodeCliPart
-WHERE (
-	SELECT COUNT(*)
-	FROM Commande Co1
-	WHERE Co1.CodeCli = C1.CodeCli
+FROM
+    Produit
+    INNER JOIN Categorie
+        ON Produit.CodeCateg = Categorie.CodeCateg
 
-) = (
-    SELECT COUNT(*)
-    FROM Commande Co2
-    WHERE Co2.CodeCli = C2.CodeCli
-)
-ORDER BY C1.Contact;
+WHERE
+    Categorie.NomCateg = 'Viandes/Volailles'
+    AND Produit.RefProd NOT IN (
+        SELECT DISTINCT DetailCommande.RefProduit
+        FROM DetailCommande
+    )
+
+ORDER BY
+    Produit.NomProd;
         </code></pre>
         </section>
         <section>
         <h2>Explication de la conception :</h2>
+        <h3>Association des tables</h3>
+        <ul>
+            <li>Produit : contient la liste de tous les produits du catalogue.</li>
+            <li>Categorie : permet de filtrer sur la catégorie « Viandes/Volailles ».</li>
+            <li>DetailCommande : liste toutes les références de produits ayant été commandés.</li>
+        </ul>
+
+        <h3>Filtrage sur la catégorie</h3>
         <p>
-            La requête utilise une auto-jointure sur la table Clientele, 
-            représentée par deux alias : C1 pour le client pilote et C2 pour le client partenaire. 
-            La condition C1.CodeCli = C2.CodeCliPart permet d'associer chaque partenaire à son pilote.
+            La condition WHERE Categorie.NomCateg = 'Viandes/Volailles'
+            limite la recherche aux seuls produits carnés.
         </p>
 
+        <h3>Exclusion des produits commandés</h3>
         <p>
-            Deux sous-requêtes corrélées utilisant COUNT(*) calculent respectivement le nombre de commandes du pilote et celui du partenaire. 
-            La clause WHERE compare ces deux nombres 
-            et conserve uniquement les couples pour lesquels ils sont égaux.
+            La sous-requête NOT IN récupère toutes les références de produits présentes dans DetailCommande,
+            c'est-à-dire tous les produits qui ont été commandés au moins une fois.
+            La condition NOT IN exclut ensuite ces produits du résultat,
+            ne conservant que ceux qui n'ont jamais été commandés.
         </p>
 
+        <h3>Tri des résultats</h3>
         <p>
-            Une sous-requête supplémentaire dans le SELECT permet d'afficher le nombre de commandes commun aux deux clients. Enfin, 
-            les résultats sont triés par ordre alphabétique des contacts des clients pilotes.
+            L'ORDER BY classe les produits par ordre alphabétique pour faciliter leur lecture.
         </p>
         </section>
         <section>
@@ -83,25 +93,28 @@ ORDER BY C1.Contact;
         <table>
             <thead>
                 <tr>
-                 <th>Pilote</th>
-                 <th>Partenaire</th>
-                 <th>NbCommande</th>
+                    <th>Produit</th>
+                    <th>Categorie</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Gus Kerba </td>
-                    <td>Isabelle Tricote</td>
-                    <td>17</td>
+                    <td>Pâté de lapin</td>
+                    <td>Viandes/Volailles</td>
+                </tr>
+                <tr>
+                    <td>Rôti de veau</td>
+                    <td>Viandes/Volailles</td>
                 </tr>
             </tbody>
         </table>
         <h2>Interprétation du résultat</h2>
         <p>
-            La requête retourne un couple de clients dont chacun a effectué 17 commandes. 
-            Le nombre de commandes du pilote est donc identique à celui de son partenaire. 
-            Ce résultat met en évidence une égalité de leur activité en matière de commandes, 
-            sans pour autant signifier que leurs chiffres d'affaires sont identiques.
+            La requête retourne les produits carnés du catalogue KDou qui n'ont fait l'objet
+            d'aucune commande. Ces articles sont présents dans l'offre mais ne génèrent aucun
+            chiffre d'affaires. KDou pourrait envisager de les retirer du catalogue,
+            de les promouvoir auprès de ses clients ou de négocier des conditions différentes
+            avec leurs fournisseurs.
         </p>
         </section>
     </main>    
