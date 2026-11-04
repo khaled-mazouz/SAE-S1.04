@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Mission 3</title>
+    <title>Mission 4</title>
 </head>
 <body>
     <header>
@@ -20,72 +20,81 @@
             <a href="mission4.html">Mission 4</a>
         </nav>
     </header>
-    <h1>Produits carnés n'ayant jamais été commandés</h1>
+    <h1>Comparaison des commandes entre clients pilotes et clients partenaires</h1>
     <main>
         <section>
-        <h2>Énoncé de la requête et objectif</h2>
+        <h2> Énoncé de la requête et objectif</h2>
         <p>
-            Problématique : Dans une réflexion sur l'offre commerciale,
-            quels sont les produits appartenant à la catégorie « Viandes/Volailles »
-            qui n'ont jamais fait l'objet d'une commande ?
+            Déterminer le nombre de produits appartenant à la catégorie « Viandes » qui n'ont jamais été commandés par les clients.
+
+L'objectif est d'identifier les produits de cette catégorie qui n'ont fait l'objet d'aucune commande.
         </p>
         <h2>Intérêt de la requête dans le contexte de KDou</h2>
         <p>
-            Cette requête permet à KDou d'identifier les produits carnés présents dans son catalogue
-            mais qui n'ont généré aucune vente. Ces informations sont utiles pour rationaliser l'offre,
-            supprimer les produits non rentables ou adapter la stratégie commerciale afin de réduire
-            les stocks inutiles et améliorer la rentabilité.
+            Cette requête permet à l'entreprise KDou de repérer les produits de la catégorie Viandes qui ne sont jamais vendus. 
+            Elle peut ainsi identifier les produits qui ne rencontrent pas de demande et réfléchir à 
+            des actions commerciales adaptées, comme modifier leur référencement ou leur stratégie de vente.
         </p>
         </section>
         <section>
         <h2>Requête SQL</h2>
-        <pre><code>
-SELECT
-    Produit.NomProd AS Produit,
-    Categorie.NomCateg AS Categorie
-
-FROM
-    Produit
-    INNER JOIN Categorie
-        ON Produit.CodeCateg = Categorie.CodeCateg
-
-WHERE
-    Categorie.NomCateg = 'Viandes/Volailles'
-    AND Produit.RefProd NOT IN (
-        SELECT DISTINCT DetailCommande.RefProduit
-        FROM DetailCommande
-    )
-
-ORDER BY
-    Produit.NomProd;
+        <pre><code> 
+SELECT COUNT(Produit.RefProd) AS Nb_Produits_Carnes_Non_Commandes
+FROM (Produit INNER JOIN Categorie ON Produit.CodeCateg = Categorie.CodeCateg)
+LEFT JOIN DetailCommande
+ON Produit.RefProd = DetailCommande.RefProduit
+WHERE Categorie.NomCateg = 'Viandes' AND DetailCommande.RefProduit IS NULL;
         </code></pre>
         </section>
         <section>
         <h2>Explication de la conception :</h2>
         <h3>Association des tables</h3>
         <ul>
-            <li>Produit : contient la liste de tous les produits du catalogue.</li>
-            <li>Categorie : permet de filtrer sur la catégorie « Viandes/Volailles ».</li>
-            <li>DetailCommande : liste toutes les références de produits ayant été commandés.</li>
+            <li>Produit : contient les références des produits.</li>
+            <li>Categorie : permet d'identifier les produits appartenant à la catégorie Viandes.</li>
+            <li>DetailCommande : contient les produits présents dans les commandes.</li>
         </ul>
-
-        <h3>Filtrage sur la catégorie</h3>
         <p>
-            La condition WHERE Categorie.NomCateg = 'Viandes/Volailles'
-            limite la recherche aux seuls produits carnés.
+            Les jointures permettent de relier les produits à leur catégorie et aux éventuelles lignes de commande correspondantes.
         </p>
 
-        <h3>Exclusion des produits commandés</h3>
+        <h3>Utilisation de LEFT JOIN</h3>
         <p>
-            La sous-requête NOT IN récupère toutes les références de produits présentes dans DetailCommande,
-            c'est-à-dire tous les produits qui ont été commandés au moins une fois.
-            La condition NOT IN exclut ensuite ces produits du résultat,
-            ne conservant que ceux qui n'ont jamais été commandés.
+            La jointure :
+
+            LEFT JOIN DetailCommande
+            ON Produit.RefProd = DetailCommande.RefProduit
+
+            permet de conserver tous les produits, même ceux qui ne sont associés à aucune commande.
+
+            Contrairement à INNER JOIN, elle conserve également les produits sans correspondance dans DetailCommande.
         </p>
 
-        <h3>Tri des résultats</h3>
+        <h3>Filtrage des produits</h3>
         <p>
-            L'ORDER BY classe les produits par ordre alphabétique pour faciliter leur lecture.
+            La condition :
+
+            WHERE Categorie.NomCateg = 'Viandes'
+            AND DetailCommande.RefProduit IS NULL
+
+            permet de sélectionner uniquement :
+
+            Les produits appartenant à la catégorie Viandes.
+
+            Les produits qui n'apparaissent dans aucune ligne de commande.
+
+            IS NULL permet donc de repérer les produits qui n'ont jamais été commandés.
+        </p>
+
+        <h3>Comptage des produits</h3>
+        <p>
+            La fonction :
+
+            COUNT(Produit.RefProd)
+
+            compte le nombre de références de produits correspondant aux conditions précédentes.
+
+            Le résultat est renommé Nb_Produits_Carnes_Non_Commandes grâce à l'alias AS.
         </p>
         </section>
         <section>
@@ -93,31 +102,30 @@ ORDER BY
         <table>
             <thead>
                 <tr>
-                    <th>Produit</th>
-                    <th>Categorie</th>
+                 <th>Nb_Produits</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Pâté de lapin</td>
-                    <td>Viandes/Volailles</td>
-                </tr>
-                <tr>
-                    <td>Rôti de veau</td>
-                    <td>Viandes/Volailles</td>
+                    <td>2</td>
                 </tr>
             </tbody>
         </table>
         <h2>Interprétation du résultat</h2>
         <p>
-            La requête retourne les produits carnés du catalogue KDou qui n'ont fait l'objet
-            d'aucune commande. Ces articles sont présents dans l'offre mais ne génèrent aucun
-            chiffre d'affaires. KDou pourrait envisager de les retirer du catalogue,
-            de les promouvoir auprès de ses clients ou de négocier des conditions différentes
-            avec leurs fournisseurs.
+            Le résultat indique que 2 produits de la catégorie Viandes n'ont jamais été commandés par les clients de KDou.
+        </p>
+        <h2>Conclusion</h2>
+
+        <p>
+            L'entreprise KDou possède donc deux produits de la catégorie Viandes qui n'ont enregistré aucune commande. 
+            Cette information peut aider l'entreprise à examiner ces références et à envisager des actions pour améliorer leur commercialisation.
         </p>
         </section>
-    </main>    
+    </main>
+    <div class="suite">
+        <a href="mission4.html">Suite →</a>
+    </div>    
     <footer>
         <div>Groupe 106</div>
         <div>Khaled Mazouz, Paul Eveno, Adham Alorbany, Raph-Nathan Colin</div>

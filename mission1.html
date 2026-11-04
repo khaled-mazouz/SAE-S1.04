@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <title>Mission 1</title>
+    <title>Mission 4</title>
 </head>
 <body>
     <header>
@@ -20,88 +20,87 @@
             <a href="mission4.html">Mission 4</a>
         </nav>
     </header>
-    <h1>Chiffre d'affaires total des fournisseurs de l'Union européenne</h1>
+    <h1>Comparaison des commandes entre clients pilotes et clients partenaires</h1>
     <main>
         <section>
-        <h2>Énoncé de la requête et objectif</h2>
+        <h2> Énoncé de la requête et objectif</h2>
         <p>
-            Problématique : Dans une réflexion sur l'origine des produits,
-            quel est le chiffre d'affaires total généré par les fournisseurs
-            situés dans des pays de l'Union européenne ?
+            Calculer le chiffre d'affaires total généré par les produits provenant de fournisseurs situés dans les pays de l'Union européenne.
+
+            L'objectif est d'obtenir un montant global correspondant aux ventes de ces produits, en tenant compte des quantités, des coûts d'achat, des coefficients de marge et des remises.
         </p>
         <h2>Intérêt de la requête dans le contexte de KDou</h2>
         <p>
-            Cette requête permet à KDou d'évaluer la part de son chiffre d'affaires
-            provenant de fournisseurs européens. Dans une démarche écoresponsable,
-            favoriser les fournisseurs de l'Union européenne réduit les distances de transport
-            et l'empreinte carbone de l'entreprise. Ces informations aident à orienter
-            la politique d'approvisionnement de KDou.
+            Cette requête permet à l'entreprise KDou de connaître le chiffre d'affaires généré par les produits provenant de fournisseurs de l'Union européenne.
+
+            Elle peut ainsi mesurer l'importance commerciale de ses fournisseurs européens et évaluer la contribution de ces produits à son activité.
         </p>
         </section>
         <section>
         <h2>Requête SQL</h2>
-        <pre><code>
-SELECT
-    Fournisseur.Societe AS Fournisseur,
-    SUM(
-        DetailCommande.Quantite
-        * Produit.CoutAchat
-        * Categorie.CoefMarge
-        * (1 - DetailCommande.Remise / 100)
-    ) AS CA_Total
-
-FROM
-    ((((Commande
-    INNER JOIN DetailCommande
-        ON Commande.[N° commande] = DetailCommande.[N° commande])
-    INNER JOIN Produit
-        ON DetailCommande.RefProduit = Produit.RefProd)
-    INNER JOIN Categorie
-        ON Produit.CodeCateg = Categorie.CodeCateg)
-    INNER JOIN Fournisseur
-        ON Produit.NoFour = Fournisseur.NoFour)
-
-WHERE
-    Fournisseur.Pays IN (
-        'France', 'Allemagne', 'Italie', 'Espagne', 'Belgique',
-        'Pays-Bas', 'Portugal', 'Suède', 'Pologne', 'Autriche'
-    )
-
-GROUP BY
-    Fournisseur.Societe
-
-ORDER BY
-    CA_Total DESC;
+        <pre><code> 
+SELECT Round(Sum(D.Quantité * P.CoutAchat * C.CoefMarge
+                 * (1 - D.[Remise (%)])), 2) AS CA_total_UE
+FROM (((DetailCommande AS D
+  INNER JOIN Produit AS P ON D.RefProduit = P.RefProd)
+  INNER JOIN Categorie AS C ON P.CodeCateg = C.CodeCateg)
+  INNER JOIN Fournisseur AS F ON P.NoFour = F.NoFour)
+  INNER JOIN Pays AS Y ON F.NoPays = Y.NoPays
+WHERE Y.UE = True;
         </code></pre>
         </section>
         <section>
         <h2>Explication de la conception :</h2>
         <h3>Association des tables</h3>
         <ul>
-            <li>Commande : permet de relier les commandes aux détails.</li>
-            <li>DetailCommande : contient les quantités commandées et les remises appliquées.</li>
-            <li>Produit : permet de récupérer le coût d'achat et d'identifier le fournisseur.</li>
-            <li>Categorie : fournit le coefficient de marge pour le calcul du chiffre d'affaires.</li>
-            <li>Fournisseur : permet de filtrer selon le pays d'origine.</li>
+            <li>DetailCommande (D) : contient les quantités commandées et les remises.</li>
+            <li>Produit (P) : contient les coûts d'achat et les références des produits.</li>
+            <li>Categorie (C) : contient les coefficients de marge.</li>
+            <li>Fournisseur (F) : permet d'identifier le fournisseur de chaque produit.</li>
+            <li>Pays (Y) : permet de déterminer si le fournisseur appartient à un pays de l'Union européenne.</li>
         </ul>
-
-        <h3>Filtrage des fournisseurs</h3>
         <p>
-            La clause WHERE filtre uniquement les fournisseurs dont le pays appartient à l'Union européenne,
-            en listant les pays membres concernés dans la base.
+            Les INNER JOIN permettent de relier ces tables grâce à leurs champs communs.
+
+            Les alias D, P, C, F et Y permettent de raccourcir l'écriture de la requête.
+        </p>
+
+        <h3>Filtrage des fournisseurs européens</h3>
+        <p>
+            La condition :
+
+            WHERE Y.UE = True
+
+            permet de conserver uniquement les fournisseurs dont le pays appartient à l'Union européenne.
+
+            Le champ UE est un champ booléen : sa valeur True signifie que le pays appartient à l'Union européenne.
         </p>
 
         <h3>Calcul du chiffre d'affaires</h3>
         <p>
-            La fonction SUM() calcule le chiffre d'affaires pour chaque fournisseur selon la formule :
+            La fonction SUM() additionne les montants calculés pour toutes les lignes de commande correspondant aux fournisseurs européens.
 
-            Quantité × Coût d'achat × Coefficient de marge × (1 − Remise / 100)
+            La formule utilisée est :
+
+            Quantité × Coût d'achat × Coefficient de marge × (1 - Remise)
+
+            Elle prend en compte la quantité commandée, le coût d'achat, le coefficient de marge et la remise appliquée.
         </p>
 
-        <h3>Regroupement et tri</h3>
+        <h3>Arrondi du résultat</h3>
         <p>
-            Le GROUP BY regroupe les résultats par fournisseur, et l'ORDER BY classe les fournisseurs
-            du chiffre d'affaires le plus élevé au plus faible.
+            La fonction :
+
+            Round(Sum(...), 2)
+
+            permet d'arrondir le montant total à deux chiffres après la virgule.
+
+            L'alias AS CA_total_UE donne un nom explicite à la colonne du résultat.
+        </p>
+        <h3>Absence de regroupement</h3>
+
+        <p>
+            La requête ne contient pas de GROUP BY, car elle cherche à obtenir un seul chiffre d'affaires global pour l'ensemble des fournisseurs européens, et non un résultat par fournisseur ou par pays.
         </p>
         </section>
         <section>
@@ -109,34 +108,30 @@ ORDER BY
         <table>
             <thead>
                 <tr>
-                    <th>Fournisseur</th>
-                    <th>CA_Total</th>
+                 <th>CA_total_UE</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>Aux joyeux ecclésiastiques</td>
-                    <td>911 541,03</td>
-                </tr>
-                <tr>
-                    <td>Forêts d'érables</td>
-                    <td>561 372,18</td>
-                </tr>
-                <tr>
-                    <td>Gai pâturage</td>
-                    <td>349 876,44</td>
+                    <td>4963389.82</td>
                 </tr>
             </tbody>
         </table>
         <h2>Interprétation du résultat</h2>
         <p>
-            La requête retourne les fournisseurs de l'Union européenne classés par chiffre d'affaires décroissant.
-            Le fournisseur générant le CA le plus élevé est « Aux joyeux ecclésiastiques », ce qui indique
-            qu'il représente un partenaire commercial important parmi les fournisseurs européens.
-            Ces données permettent à KDou de mesurer la contribution de chaque fournisseur européen
-            à son activité et d'orienter ses décisions d'approvisionnement.
+            Le résultat indique que le chiffre d'affaires total calculé pour les produits provenant de fournisseurs situés dans l'Union européenne est de 4 963 389,82.
+
+            Ce montant regroupe l'ensemble des lignes de commande correspondant aux fournisseurs européens, après prise en compte des quantités, des coûts d'achat, des coefficients de marge et des remises.
+        <h2>Conclusion</h2>
+
+        <p>
+            Les produits provenant de fournisseurs européens représentent un chiffre d'affaires total calculé de 4 963 389,82 pour KDou. 
+            Cette information permet à l'entreprise de mesurer la contribution de ses fournisseurs européens à son activité commerciale.
         </p>
         </section>
+        <div class="suite">
+            <a href="mission2.html">Suite →</a>
+        </div>
     </main>    
     <footer>
         <div>Groupe 106</div>
