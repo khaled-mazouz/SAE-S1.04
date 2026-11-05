@@ -23,26 +23,26 @@
     <h1>Calcul du chiffre d'affaires annuel des desserts et des boissons</h1>
     <main>
         <section>
-        <h2>Énoncé en langage naturel et objectif</h2>
-        <p>
-            Calculer le chiffre d'affaires annuel des catégories « Desserts » et « Boissons », 
-            en regroupant les résultats par année et par catégorie.
-        </p>
+            <h2>Énoncé en langage naturel et objectif</h2>
+            <p>
+                Calculer le chiffre d'affaires annuel des catégories « Desserts » et « Boissons », 
+                en regroupant les résultats par année et par catégorie.
+            </p>
 
-        <p>
-            L'objectif est de connaître 
-            le chiffre d'affaires généré chaque année par ces deux catégories de produits.
-        </p>
-        <h2>Intérêt de la requête dans le contexte de KDou</h2>
-        <p>
-            Cette requête permet à l'entreprise KDou de suivre l'évolution de son chiffre d'affaires 
-            pour les catégories Desserts et Boissons. Elle peut ainsi identifier les performances commerciales de ces catégories selon les années, comparer 
-            leur rentabilité et mieux orienter ses décisions concernant son offre de produits.
-        </p>
+            <p>
+                L'objectif est de connaître 
+                le chiffre d'affaires généré chaque année par ces deux catégories de produits.
+            </p>
+            <h2>Intérêt de la requête dans le contexte de KDou</h2>
+            <p>
+                Cette requête permet à l'entreprise KDou de suivre l'évolution de son chiffre d'affaires 
+                pour les catégories Desserts et Boissons. Elle peut ainsi identifier les performances commerciales de ces catégories selon les années, comparer 
+                leur rentabilité et mieux orienter ses décisions concernant son offre de produits.
+            </p>
         </section>
         <section>
-        <h2>Requête SQL</h2>
-        <pre><code> 
+            <h2>Requête SQL</h2>
+            <pre><code> 
 SELECT
     Year(Commande.DateCde) AS Annee,
     Categorie.NomCateg AS Categorie,
@@ -72,124 +72,124 @@ GROUP BY
 ORDER BY
     Year(Commande.DateCde),
     Categorie.NomCateg;
-        </code></pre>
+            </code></pre>
         </section>
         <section>
-        <h2>Explication de la conception :</h2>
-        <h3>Association des tables</h3>
-        <ul>
-            <li>Commande : permet de récupérer la date de chaque commande</li>
-            <li>DetailCommande : contient les quantités commandées et les remises appliquées.</li>
-            <li>Produit : permet de récupérer le coût d'achat des produits.</li>
-            <li>Categorie : permet de récupérer le nom de la catégorie et son coefficient de marge.</li>
-        </ul>
-        <div>Les INNER JOIN permettent de relier ces quatre tables grâce à leurs champs communs.</div>
+            <h2>Explication de la conception :</h2>
+            <h3>Association des tables</h3>
+            <ul>
+                <li>Commande : permet de récupérer la date de chaque commande</li>
+                <li>DetailCommande : contient les quantités commandées et les remises appliquées.</li>
+                <li>Produit : permet de récupérer le coût d'achat des produits.</li>
+                <li>Categorie : permet de récupérer le nom de la catégorie et son coefficient de marge.</li>
+            </ul>
+            <div>Les INNER JOIN permettent de relier ces quatre tables grâce à leurs champs communs.</div>
         
-        <h3>Filtrage des catégories</h3>
-        <p>
-            La condition :
+            <h3>Filtrage des catégories</h3>
+            <p>
+                La condition :
 
-            WHERE Categorie.NomCateg IN ('Desserts', 'Boissons')
+                WHERE Categorie.NomCateg IN ('Desserts', 'Boissons')
 
-            permet de conserver uniquement les produits appartenant aux catégories Desserts et Boissons.
-        </p>
+                permet de conserver uniquement les produits appartenant aux catégories Desserts et Boissons.
+            </p>
 
-        <h3>Calcul du chiffre d'affaires</h3>
-        <p>
-            La fonction SUM() additionne les montants calculés pour chaque ligne de commande.
+            <h3>Calcul du chiffre d'affaires</h3>
+            <p>
+                La fonction SUM() additionne les montants calculés pour chaque ligne de commande.
 
-            Le calcul est :
+                Le calcul est :
 
-            Quantité × Coût d'achat × Coefficient de marge × (1 - Remise / 100)
+                Quantité × Coût d'achat × Coefficient de marge × (1 - Remise / 100)
 
-            Cela permet de prendre en compte la quantité vendue, 
-            le coût d'achat, la marge appliquée et la remise accordée.
-        </p>
+                Cela permet de prendre en compte la quantité vendue, 
+                le coût d'achat, la marge appliquée et la remise accordée.
+            </p>
 
-        <h3>Regroupement des résultats</h3>
-        <p>
-            a clause GROUP BY regroupe les données selon deux critères :
+            <h3>Regroupement des résultats</h3>
+            <p>
+                a clause GROUP BY regroupe les données selon deux critères :
 
-            L'année de la commande, extraite avec Year().
+                L'année de la commande, extraite avec Year().
 
-            Le nom de la catégorie.
+                Le nom de la catégorie.
 
-            La fonction SUM() calcule donc un chiffre d'affaires pour chaque combinaison 
-            année-catégorie.
-        </p>
+                La fonction SUM() calcule donc un chiffre d'affaires pour chaque combinaison 
+                année-catégorie.
+            </p>
 
-        <h3>Tri des résultats</h3>
+            <h3>Tri des résultats</h3>
 
-        <p> 
-            La clause ORDER BY classe les résultats par année, 
-            puis par catégorie, afin de faciliter leur lecture.
-        </p>
+            <p> 
+                La clause ORDER BY classe les résultats par année, 
+                puis par catégorie, afin de faciliter leur lecture.
+            </p>
         </section>
         <section>
-        <h2>Résultat</h2>
-        <table>
-            <thead>
-                <tr>
-                 <th>Annee</th>
-                 <th>Categorie</th>
-                 <th>CA_Annuel</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>2020</td>
-                    <td>Boissons</td>
-                    <td>122127,760509586</td>
-                </tr>
-               <tr>
-                    <td>2020</td>
-                    <td>Desserts</td>
-                    <td>57553,056054093</td>
-                </tr>
-                               <tr>
-                    <td>2021</td>
-                    <td>Boissons</td>
-                    <td>982013,768338495</td>
-                </tr>
-                               <tr>
-                    <td>2021</td>
-                    <td>Desserts</td>
-                    <td>513394,139360736</td>
-                </tr>
-                               <tr>
-                    <td>2022</td>
-                    <td>Boissons</td>
-                    <td>437,5</td>
-                </tr>
-                               <tr>
-                    <td>2022</td>
-                    <td>Desserts</td>
-                    <td>1118,32321179756</td>
-                </tr>
-            </tbody>
-        </table>
-        <h2>Interprétation du résultat</h2>
-        <ul>
-            <li>En 2020 : la catégorie Boissons génère un montant de 122 127,76, contre 57 553,06 pour les Desserts. 
-                Les Boissons représentent donc le montant le plus élevé.
-            </li>
-            <li>
-                En 2021 : les deux catégories connaissent une forte augmentation. 
-                Les Boissons atteignent 982 013,77 et les Desserts 513 394,14
-            </li>
-            <li>
-                En 2022 : les montants sont nettement plus faibles, 
-                avec 437,50 pour les Boissons et 1 118,32 pour les Desserts. 
-                Contrairement aux deux années précédentes, 
-                les Desserts dépassent les Boissons.
-            </li>
-            <p>
-                En 2022 : les montants sont nettement plus faibles, 
-                avec 437,50 pour les Boissons et 1 118,32 pour les Desserts. 
-                Contrairement aux deux années précédentes, 
-                les Desserts dépassent les Boissons.
-            </p>
-        </ul>
+            <h2>Résultat</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Annee</th>
+                        <th>Categorie</th>
+                        <th>CA_Annuel</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2020</td>
+                        <td>Boissons</td>
+                        <td>122127,760509586</td>
+                    </tr>
+                    <tr>
+                        <td>2020</td>
+                        <td>Desserts</td>
+                        <td>57553,056054093</td>
+                    </tr>
+                    <tr>
+                        <td>2021</td>
+                        <td>Boissons</td>
+                        <td>982013,768338495</td>
+                    </tr>
+                    <tr>
+                        <td>2021</td>
+                        <td>Desserts</td>
+                        <td>513394,139360736</td>
+                    </tr>
+                    <tr>
+                        <td>2022</td>
+                        <td>Boissons</td>
+                        <td>437,5</td>
+                    </tr>
+                    <tr>
+                        <td>2022</td>
+                        <td>Desserts</td>
+                        <td>1118,32321179756</td>
+                    </tr>
+                </tbody>
+            </table>
+            <h2>Interprétation du résultat</h2>
+            <ul>
+                <li>En 2020 : la catégorie Boissons génère un montant de 122 127,76, contre 57 553,06 pour les Desserts. 
+                    Les Boissons représentent donc le montant le plus élevé.
+                </li>
+                <li>
+                    En 2021 : les deux catégories connaissent une forte augmentation. 
+                    Les Boissons atteignent 982 013,77 et les Desserts 513 394,14
+                </li>
+                <li>
+                    En 2022 : les montants sont nettement plus faibles, 
+                    avec 437,50 pour les Boissons et 1 118,32 pour les Desserts. 
+                    Contrairement aux deux années précédentes, 
+                    les Desserts dépassent les Boissons.
+                </li>
+                <p>
+                    En 2022 : les montants sont nettement plus faibles, 
+                    avec 437,50 pour les Boissons et 1 118,32 pour les Desserts. 
+                    Contrairement aux deux années précédentes, 
+                    les Desserts dépassent les Boissons.
+                </p>
+            </ul>
         </section>
     </main>
     <div class="suite">
